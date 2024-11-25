@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-//Testa se é electron, e troca o stderr e stdout para console.
+//Testa se ï¿½ electron, e troca o stderr e stdout para console.
 //Test if is Electon, and change sterr e stdout for console.
 if (process.versions.electron) {
 	process.stderr.write = console.error.bind(console);
@@ -30,10 +30,8 @@ if (process.versions.electron) {
 }
 
 //Requeries
-var fs = require('fs');
-var SQL = require('sql.js');
-var path = require('path');
-var events = require('events');
+const fs = require('fs');
+const initSqlJs = require('sql.js');
 
 //Buffers storage for shared memory
 const memoryBuffers = {};
@@ -57,7 +55,7 @@ function sqlite() {
  * @param {String|Object} db - File directory+filename | buffer
  * @return {Object}
  */
-sqlite.prototype.connect = function (db) {
+sqlite.prototype.connect = async function (db) {
 	if (typeof (db) == 'string') {
 		const fileMemory = db.indexOf('file::memory:') === 0;
 		this.file = db;
@@ -65,17 +63,19 @@ sqlite.prototype.connect = function (db) {
 			this.sharedMemory = true;
 			this.file = this.file.split('?')[0];
 			if (!(this.file in memoryBuffers)) {
-				memoryBuffers[this.file] = new Buffer(0);
+				memoryBuffers[this.file] = Buffer.from([]);
 			}
 			this.buffer = memoryBuffers[this.file];
 		} else if (!db || db === ':memory:' || fileMemory) {
-			this.buffer = new Buffer(0);
+			this.buffer = Buffer.from([]);
 		} else if (fs.existsSync(this.file)) {
 			this.buffer = fs.readFileSync(this.file);
 		}
 	} else if (typeof (db) == "object") {
 		this.buffer = db;
 	}
+
+	const SQL = await initSqlJs();
 
 	if (this.buffer) {
 		try {
@@ -113,8 +113,8 @@ sqlite.prototype.run = function (sql, options, callback) {
 		callback = options;
 		options = [];
 	}
-	var results;
-	var type = sql.substring(0, 6);
+	let results;
+	let type = sql.substring(0, 6);
 	type = type.toUpperCase();
 	switch (type) {
 		case "SELECT":
@@ -149,7 +149,7 @@ sqlite.prototype.run = function (sql, options, callback) {
    * @param {String} sql - SQL code
    * @param {Array|Function} options - Array to prepared sql | callback function
    * @param {Function} callback - callback function
-   * @return {Array|Object} 
+   * @return {Array|Object}
 
    * @deprecated This function will no longer be used soon!
    */
@@ -186,20 +186,20 @@ sqlite.prototype.pvPRAGMA = function (sql, where) {
  * Runing selects - PRIVATE
  *
  * @param {String}  sql - SQL code
- * @param {Array} where - Array to prepared sql 
+ * @param {Array} where - Array to prepared sql
  * @return {Object}
  */
 sqlite.prototype.pvSELECT = function (sql, where) {
 	if (where) {
-		for (var i = 0; i < where.length; i++) {
+		for (let i = 0; i < where.length; i++) {
 			sql = sql.replace('?', ":arg" + i);
 		}
 	}
 	this.sql = sql;
 	try {
-		var stmt = this.db.prepare(sql);
+		let stmt = this.db.prepare(sql);
 		stmt.bind(where);
-		var resultado = [];
+		let resultado = [];
 		while (stmt.step()) {
 			resultado.push(stmt.getAsObject());
 		}
@@ -219,18 +219,18 @@ sqlite.prototype.pvSELECT = function (sql, where) {
  * Runing deletes - PRIVATE
  *
  * @param {String}  sql - SQL code
- * @param {Array} where - Array to prepared sql 
+ * @param {Array} where - Array to prepared sql
  * @return {Boo}
  */
 sqlite.prototype.pvDELETE = function (sql, where) {
 	if (where) {
-		for (var i = 0; i < where.length; i++) {
+		for (let i = 0; i < where.length; i++) {
 			sql = sql.replace('?', ":arg" + i);
 		}
 	}
 	this.sql = sql;
 	try {
-		var stmt = this.db.prepare(sql);
+		let stmt = this.db.prepare(sql);
 		stmt.bind(where);
 		stmt.step();
 		stmt.free();
@@ -250,22 +250,22 @@ sqlite.prototype.pvDELETE = function (sql, where) {
  * Runing insets - PRIVATE
  *
  * @param {String}  sql - SQL code
- * @param {Array} data - Array to prepared sql 
+ * @param {Array} data - Array to prepared sql
  * @return {Int} last insert id
  */
 sqlite.prototype.pvINSERT = function (sql, data) {
 	if (data) {
-		for (var i = 0; i < data.length; i++) {
+		for (let i = 0; i < data.length; i++) {
 			sql = sql.replace('?', ":arg" + i);
 		}
 	}
 	this.sql = sql;
 	try {
-		var stmt = this.db.prepare(sql);
+		let stmt = this.db.prepare(sql);
 		stmt.bind(data);
 		stmt.step();
 		stmt.free();
-		var last = this.pvSELECT("SELECT last_insert_rowid()");
+		let last = this.pvSELECT("SELECT last_insert_rowid()");
 		this.write();
 		return last[0]['last_insert_rowid()'];
 	} catch (x) {
@@ -283,18 +283,18 @@ sqlite.prototype.pvINSERT = function (sql, data) {
  * Runing updates - PRIVATE
  *
  * @param {String}  sql - SQL code
- * @param {Array} data - Array to prepared sql 
- * @return {Boo} 
+ * @param {Array} data - Array to prepared sql
+ * @return {Boo}
  */
 sqlite.prototype.pvUPDATE = function (sql, data) {
 	if (data) {
-		for (var i = 0; i < data.length; i++) {
+		for (let i = 0; i < data.length; i++) {
 			sql = sql.replace('?', ":arg" + i);
 		}
 	}
 	this.sql = sql;
 	try {
-		var stmt = this.db.prepare(sql);
+		let stmt = this.db.prepare(sql);
 		stmt.bind(data);
 		stmt.step();
 		stmt.free();
@@ -319,9 +319,9 @@ sqlite.prototype.pvUPDATE = function (sql, data) {
  * @return {Int|Object} - insert id | instance
  */
 sqlite.prototype.insert = function (entity, data, callback) {
-	var keys = [];
-	var values = []
-	var binds = [];
+	let keys = [];
+	let values = []
+	let binds = [];
 	for (key in data) {
 		if (!data.hasOwnProperty(key)) continue;
 		keys.push(key);
@@ -329,7 +329,7 @@ sqlite.prototype.insert = function (entity, data, callback) {
 		binds.push('?');
 	}
 
-	var sql = "INSERT INTO " + entity + " (" + keys.join(',') + ") VALUES (" + binds.join(",") + ")";
+	let sql = "INSERT INTO " + entity + " (" + keys.join(',') + ") VALUES (" + binds.join(",") + ")";
 	this.sql = sql;
 	if (callback) {
 		callback(this.run(sql, values));
@@ -349,13 +349,13 @@ sqlite.prototype.insert = function (entity, data, callback) {
  * @return {Boo|Object} - result | instance
  */
 sqlite.prototype.update = function (entity, data, clause, callback) {
-	var sets = [];
-	var where = [];
+	let sets = [];
+	let where = [];
 	if (typeof (clause) == "function") {
 		callback = clause;
 		clause = {};
 	}
-	var values = [];
+	let values = [];
 	for (key in data) {
 		if (!data.hasOwnProperty(key)) continue;
 		sets.push(key + " = ?");
@@ -367,7 +367,7 @@ sqlite.prototype.update = function (entity, data, clause, callback) {
 		values.push(clause[key]);
 	}
 
-	var sql = "UPDATE " + entity + " SET " + sets.join(', ') + (where.length > 0 ? " WHERE " + where.join(" AND ") : "");
+	let sql = "UPDATE " + entity + " SET " + sets.join(', ') + (where.length > 0 ? " WHERE " + where.join(" AND ") : "");
 
 	this.sql = sql;
 
@@ -388,13 +388,13 @@ sqlite.prototype.update = function (entity, data, clause, callback) {
  * @return {Boo|Object} - result | instance
  */
 sqlite.prototype.delete = function (entity, clause, callback) {
-	var where = [];
+	let where = [];
 	if (typeof (clause) == "function") {
 		callback = clause;
 		clause = [];
 	}
 
-	var values = [];
+	let values = [];
 	if (clause) {
 		for (key in clause) {
 			if (!clause.hasOwnProperty(key)) continue;
@@ -403,11 +403,11 @@ sqlite.prototype.delete = function (entity, clause, callback) {
 		}
 	}
 
-	var sql = "DELETE FROM " + entity + " WHERE " + where.join(" AND ");
+	let sql = "DELETE FROM " + entity + " WHERE " + where.join(" AND ");
 
 	this.sql = sql;
 
-	var result = this.pvDELETE(sql, values);
+	let result = this.pvDELETE(sql, values);
 
 	if (callback) {
 		callback(result);
@@ -421,12 +421,12 @@ sqlite.prototype.delete = function (entity, clause, callback) {
  * Runing All - PRIVATE
  *
  * @param {String}  sql - SQL
- * @return {Boo} 
+ * @return {Boo}
  */
 sqlite.prototype.runAll = function (sql) {
 	this.sql = sql;
 	try {
-		var tes = this.db.exec(sql)
+		let tes = this.db.exec(sql)
 		this.write();
 		return tes;
 	} catch (x) {
@@ -442,11 +442,11 @@ sqlite.prototype.runAll = function (sql) {
 /**
  * Writing file or calling buffer callback
  *
- * @return {Object} 
+ * @return {Object}
  */
 sqlite.prototype.write = function () {
-	var data = this.db.export();
-	var buffer = new Buffer(data);
+	let data = this.db.export();
+	let buffer = Buffer.from(data);
 
 	if (this.sharedMemory) {
 		memoryBuffers[this.file] = buffer;
@@ -462,7 +462,7 @@ sqlite.prototype.write = function () {
  * Creating functions
  *
  * @param {Function} func - the function
- * @return {Object} 
+ * @return {Object}
  */
 sqlite.prototype.create_function = function (func) {
 	this.db.create_function(func.name, func);
