@@ -16,7 +16,7 @@
     "async",
     "database"
   ],
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": {
     "name": "asdfghjkkl11",
     "email": "asdfghjkkl11@naver.com"
@@ -25,13 +25,15 @@
     "type": "git",
     "url": "https://github.com/asdfghjkkl11/sqlite-sync.js"
   },
+  "devDependencies": {
+    "npm": "^10.9.1"
+  },
   "dependencies": {
-    "npm": "^10.9.1",
     "sql.js": "^1.12.0"
   },
   "scripts": {
     "test": "node test/test.js",
-    "publish": "npm publish --access=public"
+    "release": "npm publish --access=public"
   },
   "license": "MIT",
   "engines": {
