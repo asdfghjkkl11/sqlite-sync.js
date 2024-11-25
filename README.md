@@ -11,10 +11,13 @@ npm i @asdfghjkkl11/sqlite-sync
 
 # Usage
 ```js
-var sqlite = require('sqlite-sync'); //requiring
+var sqlite = require('@asdfghjkkl11/sqlite-sync'); //requiring
+
+//Initiating
+await sqlite.init();
 
 //Connecting - if the file does not exist it will be created
-await sqlite.connect('test/test.db'); 
+sqlite.connect('test/test.db'); 
 
 //Creating table - you can run any command
 sqlite.run("CREATE TABLE COMPANYS(ID  INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL);",function(res){

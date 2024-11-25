@@ -37,6 +37,7 @@ const initSqlJs = require('sql.js');
 const memoryBuffers = {};
 
 //Variables
+sqlite.prototype.SQL = null;
 sqlite.prototype.db = null;
 sqlite.prototype.buffer = null;
 sqlite.prototype.writer = null;
@@ -50,12 +51,19 @@ function sqlite() {
 }
 
 /**
+ * Database initiate
+ */
+sqlite.prototype.init = async function () {
+	this.SQL = await initSqlJs();
+}
+
+/**
  * Database connection
  *
  * @param {String|Object} db - File directory+filename | buffer
  * @return {Object}
  */
-sqlite.prototype.connect = async function (db) {
+sqlite.prototype.connect = function (db) {
 	if (typeof (db) == 'string') {
 		const fileMemory = db.indexOf('file::memory:') === 0;
 		this.file = db;
@@ -75,17 +83,15 @@ sqlite.prototype.connect = async function (db) {
 		this.buffer = db;
 	}
 
-	const SQL = await initSqlJs();
-
 	if (this.buffer) {
 		try {
-			this.db = new SQL.Database(this.buffer);
+			this.db = new this.SQL.Database(this.buffer);
 		} catch (x) {
 			throw x;
 		}
 	} else {
 		try {
-			this.db = new SQL.Database();
+			this.db = new this.SQL.Database();
 			this.write();
 		} catch (x) {
 			throw x;

@@ -1,7 +1,8 @@
 const sqlite = require('../sqlite');
 
 async function test_func() {
-	await sqlite.connect('test/test.db');
+	await sqlite.init();
+	sqlite.connect('test/test.db');
 // sqlite.debug = true;
 
 	let res = sqlite.run("CREATE TABLE COMPANYS(ID  INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL);");
