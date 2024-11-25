@@ -1,5 +1,5 @@
 {
-  "name": "sqlite-sync",
+  "name": "@asdfghjkkl11/sqlite-sync",
   "description": "Node module to sqlite sync and async ",
   "readmeFilename": "README.md",
   "keywords": [
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/asdfghjkkl11/sqlite-sync.js"
+    "url": "https://github.com/asdfghjkkl11/sqlite-sync.js"
   },
   "dependencies": {
     "npm": "^10.9.1",
