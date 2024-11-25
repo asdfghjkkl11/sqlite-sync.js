@@ -6,7 +6,7 @@ node.js package for database connection with <strong> SQLite </strong>, and exec
 
 # Install
 ```shell
-npm install sqlite-sync
+npm i @asdfghjkkl11/sqlite-sync
 ```
 
 # Usage
@@ -14,7 +14,7 @@ npm install sqlite-sync
 var sqlite = require('sqlite-sync'); //requiring
 
 //Connecting - if the file does not exist it will be created
-sqlite.connect('test/test.db'); 
+await sqlite.connect('test/test.db'); 
 
 //Creating table - you can run any command
 sqlite.run("CREATE TABLE COMPANYS(ID  INTEGER PRIMARY KEY AUTOINCREMENT, NAME TEXT NOT NULL);",function(res){
