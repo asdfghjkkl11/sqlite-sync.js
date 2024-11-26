@@ -11,12 +11,16 @@ node.js package for database connection with <strong> SQLite </strong>, and exec
 
 # Install
 ```shell
-npm i @asdfghjkkl11/sqlite-sync
+-origin
+npm i @asdfghjkkl11/sqlite-sync 
+-alias
+npm i sqlite-sync@npm:@asdfghjkkl11/sqlite-sync 
 ```
 
 # Usage
 ```js
-var sqlite = require('@asdfghjkkl11/sqlite-sync'); //requiring
+const sqlite = require('@asdfghjkkl11/sqlite-sync'); //requiring
+const sqlite = require('sqlite-sync'); //alias
 
 //Initiating
 await sqlite.init();
@@ -39,7 +43,7 @@ sqlite.insert("COMPANYS",{NAME:"My COMPANY"}, function(res){
 });
 
 //Updating - returns the number of rows modified - can be async too
-var rows_modified = sqlite.update("COMPANYS",{NAME:"TESTING UPDATE"},{ID:1});
+let rows_modified = sqlite.update("COMPANYS",{NAME:"TESTING UPDATE"},{ID:1});
 
 //Create your function
 function test(a,b){
